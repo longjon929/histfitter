@@ -93,7 +93,8 @@ class Logger:
         """
         self._log = TMsgLogger()
         self._log.SetSource(name)
-        self._log.SetMinLevel(INFO)
+        #self._log.SetMinLevel(INFO)
+        self._log.SetMinLevel(VERBOSE) # jdl
         self._levelLock = False
 
     def setLevel(self, level, lock=False):
