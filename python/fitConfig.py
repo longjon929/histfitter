@@ -70,6 +70,7 @@ class fitConfig:
         self.measurements = []
         self.channels = []
         self.functions = []
+        self.factoryExpressions = []
         self.sampleList = []
         self.samplesToMerge = []
         self.signalSample = None
@@ -199,6 +200,25 @@ class fitConfig:
             #                chan.getSample(sample.name).addSystematic(s)
         return
 
+    def runFactoryExpressions(self):
+        """
+        Run edit strings on workspace and re-write output file
+        """
+        
+        f = ROOT.TFile(self.wsFileName, "w")
+        ws = f.Get("combined")
+
+        for fe in self.factoryExpressions:
+            log.debug("Current factory expression = " + fe)
+            ws.factory(fe)
+
+        ws.writeToFile(self.wsFileName, False)
+        f.Close()
+
+        log.info(f"Edited workspace 'combined' in file {self.wsFileName} with {len(self.factoryExpressions)} edits.")
+        
+        return
+
     def writeWorkspaces(self):
         """
         Write out RooFit workspaces for this configuration
@@ -225,6 +245,9 @@ class fitConfig:
             
             # Note: this function's name is deceiving - does not run fits unless m.exportOnly=False
             ROOT.RooStats.HistFactory.MakeModelAndMeasurementFast(m)
+
+            if len(self.factoryExpressions) > 0:
+                self.runFactoryExpressions()
         return
 
     def close(self):
@@ -243,6 +266,13 @@ class fitConfig:
         @param dependents String with the list of dependent parameters
         """
         self.functions.append( (funcName, expression, dependents) )
+
+    def addFactoryExpression(self, expression):
+        """
+        @param expression String with expression to use  in workspace::factory()
+        """
+
+        self.factoryExpressions.append(expression)        
 
 
     def addMeasurement(self, name, lumi, lumiErr):
@@ -924,5 +954,11 @@ class fitConfig:
         p.close()
 
         log.info("Created workspace 'combined' in file '%s'\n" % self.wsFileName)
+
+        if len(self.factoryExpressions) > 0:
+            self.runFactoryExpressions()
         return
+
+
+
 
