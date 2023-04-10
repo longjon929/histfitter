@@ -103,7 +103,7 @@ RooStats::HypoTestTool::HypoTestTool() : m_hc(0), m_calc(0),
     mResultFileName(),
     mNoSystematics(false),
     mConfLevel(0.95),
-    m_logger("HypoTestTool"),
+    m_logger("HypoTestTool",kDEBUG),
     m_generateAsimovDataForObserved(false)
 {
     // enable internal likelihood offsetting for enhanced numeric precision
@@ -312,10 +312,13 @@ RooStats::HypoTestTool::RunHypoTestInverter(RooWorkspace * w,
     if (!ok) {
         return 0;
     }
+    std::cout<<"HypoTestTool "<<__LINE__<<std::endl;
 
     /// by now m_calc has been setup okay ...
     TStopwatch tw; 
     tw.Start();
+
+    // Crash is here:
     HypoTestInverterResult * r = m_calc->GetInterval();
 
     m_logger << kINFO << "Time to perform limit scan \n";
@@ -546,7 +549,7 @@ RooStats::HypoTestTool::SetupHypoTestCalculator(RooWorkspace * w, bool doUL,
         RooCmdArg _Hesse(Hesse(false));
         RooCmdArg _Minimizer(Minimizer(mMinimizerType.c_str(), "Migrad"));
         RooCmdArg _Offset(Offset(true));
-        RooCmdArg _AsymptoticError(AsymptoticError(true));
+        RooCmdArg _AsymptoticError(AsymptoticError(true)); //jdl
         RooCmdArg _Strategy_speed(Strategy(0));
         RooCmdArg _Strategy_default(Strategy(1));
         RooCmdArg _Verbose(Verbose(verbose));
@@ -568,22 +571,27 @@ RooStats::HypoTestTool::SetupHypoTestCalculator(RooWorkspace * w, bool doUL,
         
         fitArgs.Add(dynamic_cast<TObject*>(&_Strategy_default));
         fitArgs_speed.Add(dynamic_cast<TObject*>(&_Strategy_speed));
-        
+        std::cout<<"fit call JDL"<<std::endl;
         RooFitResult *fitres = sbModel->GetPdf()->fitTo(*data, fitArgs_speed);
         
         if (fitres->status() != 0) {
             Warning("HypoTestTool", "Fit to the model failed - try with strategy 1");
             fitres = sbModel->GetPdf()->fitTo(*data, fitArgs);
         }
-        if (fitres->status() != 0) 
+        if (fitres->status() != 0) {
             Warning("HypoTestTool", "Fit still failed - continue anyway.....");
+        }
+
+        if (fitres->covQual()!=3){
+            m_logger << kWARNING << "HypoTestTool: " << "Fit covariance quality not the best: " << fitres->covQual() << GEndl;
+        }
 
         poihat  = poi->getVal();
         m_logger << kINFO << "HypoTestTool - Best Fit value : " << poi->GetName() << " = "  
             << poihat << " +/- " << poi->getError() << GEndl;
         m_logger << kINFO << "Time for fitting : "; tw.Print(); 
 
-        RooArgSet newSnapSet;
+        RooArgSet newSnapSet; // jdl was not this to line 614
         if (tPoiSet!=0) newSnapSet.add(*tPoiSet); // make sure this is the full poi set.
 
         if ((prevSnapSet!=0)) {
@@ -601,9 +609,10 @@ RooStats::HypoTestTool::SetupHypoTestCalculator(RooWorkspace * w, bool doUL,
 
         //save best fit value in the poi snapshot 
         //sbModel->SetSnapshot(*sbModel->GetParametersOfInterest());
-        sbModel->SetSnapshot(newSnapSet);
+        sbModel->SetSnapshot(newSnapSet); // JDL check this snapshot
         m_logger << kINFO << "HypoTestTool: snapshot of S+B Model " << sbModel->GetName() 
             << " is set to the best fit value" << GEndl;  
+            // end of block comment test
     }
 
     // and reset poi
