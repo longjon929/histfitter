@@ -1324,6 +1324,10 @@ class ConfigManager:
             chan.getSample(sam.name).addHistoSys(syst.name, nomName, highName, lowName, 
                                                 includeOverallSys=True, normalizeSys=True, symmetrize=False, oneSide=False, 
                                                 samName=sam.name, normString=normString, nomSysName=nomSysName)
+        elif syst.method == "overallNormHistoSysRemoveShape":
+            chan.getSample(sam.name).addHistoSys(syst.name, nomName, highName, lowName, 
+                                                includeOverallSys=True, normalizeSys=True, symmetrize=False, oneSide=False, 
+                                                samName=sam.name, normString=normString, nomSysName=nomSysName, removeShape = True)
         elif syst.method == "overallNormHistoSysOneSide":
             chan.getSample(sam.name).addHistoSys(syst.name, nomName, highName, lowName, 
                                                 includeOverallSys=True, normalizeSys=True, symmetrize=False, oneSide=True,

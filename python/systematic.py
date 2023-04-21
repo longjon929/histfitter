@@ -66,6 +66,7 @@ class SystematicBase:
         allowedSys = ["histoSys","overallSys","userOverallSys","overallHistoSys","normHistoSys",
                       "shapeSys","shapeStat","histoSysOneSide","histoSysOneSideSym","normHistoSysOneSide","normHistoSysOneSideSym","userHistoSys","userNormHistoSys",
                       "overallNormHistoSys","overallNormHistoSysOneSide","overallNormHistoSysOneSideSym", "overallNormSys", 
+                      "overallNormHistoSysRemoveShape",
                       "normHistoSysEnvelopeSym", "histoSysEnvelopeSym", "overallNormHistoSysEnvelopeSym" ]
 
         if not self.method in allowedSys:
@@ -184,6 +185,7 @@ class SystematicBase:
                             "overallNormSys", "normHistoSys", 
                             "normHistoSysOneSide", "normHistoSysOneSideSym", 
                             "normHistoSysEnvelopeSym", "overallNormHistoSys", 
+                            "overallNormHistoSysRemoveShape",
                             "overallNormHistoSysEnvelopeSym", "overallNormHistoSysOneSide", "overallNormHistoSysOneSideSym"]
         
         if not (self.method in _allowed_methods and (not sam.noRenormSys)):

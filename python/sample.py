@@ -656,7 +656,7 @@ class Sample:
     # NOTE: not using @property because of the optional argument
     treename = property(getTreename)
 
-    def addHistoSys(self, systName, nomName, highName, lowName, includeOverallSys, normalizeSys, symmetrize=False, oneSide=False, samName="", normString="", nomSysName="", symmetrizeEnvelope=False):
+    def addHistoSys(self, systName, nomName, highName, lowName, includeOverallSys, normalizeSys, symmetrize=False, oneSide=False, samName="", normString="", nomSysName="", symmetrizeEnvelope=False, removeShape = False):
         """
         Add a HistoSys entry using the nominal, high and low histograms, set if to include OverallSys
 
@@ -866,7 +866,10 @@ class Sample:
             # Now, finally add the systematic
             if oneSide and not symmetrize:
                 ## MB : avoid swapping of histograms, always pass high and nominal
-                if not configMgr.prun:
+                if removeShape:
+                    log.info(f"Remove shape systematics {systName} for histogram {nomName} because removeShape = True")
+                    self.systListHistoPruned.append(systName)
+                elif not configMgr.prun:
                     self.histoSystList.append((systName, highName+"Norm", nomName, configMgr.histCacheFile, "", "", "", ""))
                 else:
                     #checking here if systematics really affect the shape. Note that we don't need to check the normaliaztion, as this part is moved to an overallSys, that we check below
@@ -876,7 +879,10 @@ class Sample:
                         log.info(f"Remove shape systematics {systName} for histogram {nomName} as differences smaller {configMgr.prunThreshold} or found small in chi2 test")
                         self.systListHistoPruned.append(systName)
             else:
-                if not configMgr.prun:
+                if removeShape:
+                    log.info(f"Remove shape systematics {systName} for histogram {nomName} because removeShape = True")
+                    self.systListHistoPruned.append(systName)
+                else not configMgr.prun:
                     self.histoSystList.append((systName, highName+"Norm", lowName+"Norm", configMgr.histCacheFile, "", "", "", ""))
                 else:
                     #checking here if systematics really affect the shape. Note that we don't need to check the normaliaztion, as this part is moved to an overallSys, that we check below
@@ -932,7 +938,10 @@ class Sample:
             # Check whether a renormalization actually makes sense
             if nomIntegral == 0 or lowIntegral == 0 or highIntegral == 0:
                 # MB : cannot renormalize, so don't after all
-                if not configMgr.prun:
+                if removeShape:
+                    log.info(f"Remove shape systematics {systName} for histogram {nomName} because removeShape = True")
+                    self.systListHistoPruned.append(systName)
+                elif not configMgr.prun:
                     self.histoSystList.append((systName, highName, lowName, configMgr.histCacheFile, "", "", "", ""))
                 else:
                     ## check shape effect
@@ -962,7 +971,10 @@ class Sample:
                     log.error(f"    generating HistoSys for {nomName} syst={systName}: nom={nomIntegral:g} high={highIntegral:g} low={lowIntegral:g} keeping in fit (offending histogram should be empty).")
                     return
                 
-                if not configMgr.prun:
+                if removeShape:
+                    log.info(f"Remove shape systematics {systName} for histogram {nomName} because removeShape = True")
+                    self.systListHistoPruned.append(systName)
+                elif not configMgr.prun:
                     self.histoSystList.append((systName, highName+"Norm", lowName+"Norm", configMgr.histCacheFile, "", "", "", ""))
                     self.addOverallSys(systName, high, low)
 
