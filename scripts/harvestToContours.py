@@ -669,7 +669,8 @@ def interpolateSurface(modelDict = {}, interpolationFunction = "linear", useROOT
                     print (">>> ... ... scipy interpolation scheme not recognized. See -h for options.")
                     sys.exit(1)
 
-            except:
+            except Exception as e:
+                print("Exception: ",e)
                 print (">>> ... Interpolation failing!!! Check to make sure there are no NANs or double defined points in your input JSON!")
                 print (">>> ... Printing points we're trying to interpolate (x,y,z) triplets:")
 
