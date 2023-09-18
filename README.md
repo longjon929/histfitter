@@ -33,13 +33,21 @@ git add HistFitter && git commit -m "Add HistFitter submodule"
 
 ### Recommended Root version
 
-Recommended Root version is `6.28/00`. This version of HistFitter is not compatible with ROOT versions < 6.28.  The minimum cmake version is `3.21`.
+The recommended Root version is `6.28/04`. This version of HistFitter is not compatible with ROOT versions < 6.28.  The minimum cmake version is `3.21`.
 
-An LCG release with the correct ROOT, Python, and cmake versions can be loaded on lxplus with
+An LCG release with the correct ROOT, Python, and cmake versions can be loaded on lxplus via the ATLAS software setup:
 
 ```
 source setup_lcg.sh
 ```
+
+HistFitter is also available in the ATLAS StatAnalysis release, which can be loaded with `source setup_lcg.sh -s`, or standalone with:
+
+```
+setupATLAS
+asetup StatAnalysis,0.2.3
+```
+
 
 ## Build and install
 
